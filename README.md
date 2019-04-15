@@ -22,7 +22,7 @@ js框架：vue2.x
 ui框架：element-ui
 
 #项目结构
-![image](https://github.com/zqh531500317/blog-boot/blob/master/doc/screenshots/%E9%A6%96%E9%A1%B5.PNG)
+![image](https://github.com/zqh531500317/blog-boot/blob/master/doc/screenshots/%E8%84%91%E5%9B%BE.png)
 
 #使用方法
 1、创建数据库blog
