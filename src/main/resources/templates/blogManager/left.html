@@ -1,0 +1,43 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<div class="main-left" th:fragment="left">
+    <el-menu class="el-menu-vertical-demo" :router="true">
+        <el-menu-item index="/user">
+            <i class="el-icon-view"></i>
+            <span slot="title">用户管理</span>
+        </el-menu-item>
+        <el-menu-item index="/category">
+            <i class="el-icon-menu"></i>
+            <span slot="title">类别管理</span>
+        </el-menu-item>
+        <el-menu-item index="/article">
+            <i class="el-icon-document"></i>
+            <span slot="title">文章管理</span>
+        </el-menu-item>
+        <el-menu-item index="/comment">
+            <i class="el-icon-location"></i>
+            <span slot="title">评论管理</span>
+        </el-menu-item>
+        <el-submenu index="/system">
+            <template slot="title">
+                <i class="el-icon-setting"></i>
+                <span>系统管理</span>
+            </template>
+            <el-menu-item index="/system/log">系统日志</el-menu-item>
+            <el-menu-item index="/system/druid">
+                <a href="/druid" target="_blank">连接池监测</a>
+            </el-menu-item>
+            <el-menu-item index="/system/swagger">
+                <a href="/swagger-ui.html" target="_blank">swagger文档</a>
+            </el-menu-item>
+        </el-submenu>
+    </el-menu>
+</div>
+
+</body>
+
+</html>

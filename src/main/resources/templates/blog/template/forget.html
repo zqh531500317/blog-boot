@@ -1,0 +1,103 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+
+<template id="forget" th:fragment="forget">
+    <div>
+        <el-steps :active="status" finish-status="success">
+            <el-step title="填写账号"></el-step>
+            <el-step title="身份验证"></el-step>
+            <el-step title="设置新密码"></el-step>
+            <el-step title="完成"></el-step>
+        </el-steps>
+        <div v-if="status==0">
+            <el-input v-model="username" placeholder="账号"></el-input>
+            <el-button type="primary" @click="sb_username">确定</el-button>
+        </div>
+        <div v-if="status==1">
+            <el-input v-model="check" placeholder="邮箱验证码"></el-input>
+            <el-button type="primary" @click="sb_check">验证</el-button>
+        </div>
+        <div v-if="status==2">
+            <el-input type="password" v-model="password" placeholder="新的密码" autocomplete="off"></el-input>
+            <el-input type="password" v-model="password1" placeholder="确认密码" autocomplete="off"></el-input>
+            <el-button type="primary" @click="sb_password">确认</el-button>
+        </div>
+        <div v-if="status==3">
+            <h3 class="success">成功</h3>
+        </div>
+    </div>
+</template>
+<script th:fragment="script">
+    const forget = {
+        template: "#forget",
+        data() {
+            return {
+                status: 0,
+                forgetUrl: "/api/user/forget/",
+                username: "",
+                check: "",
+                password: "",
+                password1: ""
+            }
+        },
+        methods: {
+            sb_username() {
+                const {username, forgetUrl, status} = this;
+                console.log(username, forgetUrl, status);
+                let params = new URLSearchParams();
+                params.append('username', username);
+                axios({
+                    method: 'post',
+                    url: forgetUrl + status,
+                    data: params
+                }).then(res => {
+                    if (res.data) {
+                        this.status++;
+                    }
+                })
+            },
+            sb_check() {
+                const {check, forgetUrl, status} = this;
+                console.log(check, forgetUrl, status);
+                let params = new URLSearchParams();
+                params.append('check', check);
+                axios({
+                    method: 'post',
+                    url: forgetUrl + status,
+                    data: params
+                }).then(res => {
+                    if (res.data) {
+                        this.status++;
+                    }
+                })
+            },
+            sb_password() {
+                const {password, password1, forgetUrl, status} = this;
+                console.log(password, password1, forgetUrl, status);
+                if (password !== password1) {
+                    alert("两次密码不一致!");
+                    return;
+                }
+                let params = new URLSearchParams();
+                params.append('password', password);
+                axios({
+                    method: 'post',
+                    url: forgetUrl + status,
+                    data: params
+                }).then(res => {
+                    if (res.data) {
+                        this.status++;
+                    }
+                })
+            }
+        }
+    };
+</script>
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqh.blogboot.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zqh.blogboot.pojo.User">
+        <id column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="nickname" property="nickname"/>
+        <result column="email" property="email"/>
+        <result column="locked" property="locked"/>
+        <result column="article_num" property="articleNum"/>
+        <result column="comment_num" property="commentNum"/>
+        <result column="ctime" property="ctime"/>
+        <result column="role" property="role"/>
+        <result column="is_delete" property="isDelete"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, username, password, nickname, email, locked, article_num, comment_num, ctime, role, is_delete
+    </sql>
+    <insert id="addUser">
+        insert into user (user_id,
+                          username,
+                          password,
+                          nickname,
+                          email,
+                          locked,
+                          article_num,
+                          comment_num,
+                          ctime,
+                          role,
+                          is_delete)
+        VALUES (default, #{username}, #{password}, #{nickname}, #{email}, 0, 0, 0, now(), #{role}, 0)
+    </insert>
+    <insert id="apiAddUser" useGeneratedKeys="true" keyColumn="user_id" keyProperty="userId">
+        insert into user (user_id,
+                          username,
+                          password,
+                          nickname,
+                          email,
+                          locked,
+                          article_num,
+                          comment_num,
+                          ctime,
+                          role,
+                          is_delete)
+        VALUES (default, #{username}, #{password}, #{nickname}, #{email}, 1, 0, 0, now(), 2, 0)
+    </insert>
+    <update id="incArticleNum">
+        update user
+        set article_num = article_num + 1
+        where user_id = #{userId}
+    </update>
+    <update id="incCommentNum">
+        update user
+        set comment_num = comment_num + 1
+        where user_id = #{userId}
+    </update>
+    <select id="selectUserList" resultType="com.zqh.blogboot.pojo.User">
+        select user_id as userId,
+        username,
+        nickname,
+        email,
+        locked,
+        article_num as articleNum,
+        comment_num as commentNum,
+        ctime,
+        role,
+        is_delete
+        from user
+        <where>
+            <if test="userQuery.username!=null and userQuery.username !=''">
+                and username like concat('%',#{userQuery.username},'%')
+            </if>
+            <if test="userQuery.datemin!=null">
+                and ctime <![CDATA[ >= ]]> #{userQuery.datemin}
+            </if>
+            <if test="userQuery.datemax!=null">
+                and ctime <![CDATA[ <= ]]> #{userQuery.datemax}
+            </if>
+            <if test="userQuery.role!=null">
+                and role=#{userQuery.role}
+            </if>
+            and is_delete=0
+        </where>
+        order by userId desc
+    </select>
+
+</mapper>

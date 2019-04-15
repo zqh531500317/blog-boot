@@ -1,0 +1,239 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<template id="article" th:fragment="article">
+    <div style="width: 1100px">
+        <!--搜索区域-->
+        <el-row :gutter="4" class="space">
+            <el-col :span="2">日期范围：</el-col>
+            <el-col :span="4">
+                <el-date-picker type="date" placeholder="选择日期" v-model="datemin"
+                                value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>
+            </el-col>
+            <el-col :span="1" style="text-align:center">
+                -
+            </el-col>
+            <el-col :span="4">
+                <el-date-picker type="date" placeholder="选择日期" v-model="datemax"
+                                value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>
+            </el-col>
+            <el-col :span="4">
+                <el-input v-model="userId" placeholder="输入用户id"></el-input>
+            </el-col>
+            <el-col :span="4">
+                <el-input v-model="title" placeholder="输入文章"></el-input>
+            </el-col>
+            <el-col :span="4">
+                <el-button icon="el-icon-search" circle type="primary" @click="searchArticle"></el-button>
+            </el-col>
+        </el-row>
+        <!--操作区域-->
+        <el-row class="space back_lightblue">
+            <el-col :span="4">
+                <el-button type="primary" class="el-icon-plus">
+                    <router-link to="/articleAdd">添加文章</router-link>
+                </el-button>
+            </el-col>
+        </el-row>
+        <el-table
+                ref="articleTable"
+                :data="articleList"
+                tooltip-effect="dark"
+                style="width: 100%"
+                class="space">
+            <el-table-column
+                    fixed
+                    type="index"
+                    width="50">
+            </el-table-column>
+            <el-table-column
+                    label="文章id"
+                    width="70"
+                    prop="article.articleId">
+            </el-table-column>
+            <el-table-column
+                    prop="article.title"
+                    label="标题"
+                    width="200">
+            </el-table-column>
+            <el-table-column
+                    prop="article.desc"
+                    label="概括"
+                    width="300">
+            </el-table-column>
+            <el-table-column
+                    prop="article.like"
+                    label="收藏数"
+                    width="70">
+            </el-table-column>
+            <el-table-column
+                    prop="article.view"
+                    label="浏览数"
+                    width="70">
+            </el-table-column>
+            <el-table-column
+                    prop="isTop"
+                    label="是否置顶"
+                    width="80">
+                <template slot-scope="scope">
+                    <span v-if="scope.row.article.isTop">是</span>
+                    <span v-if="!scope.row.article.isTop">否</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    prop="article.ctime"
+                    label="创建时间"
+                    width="200">
+                <template slot-scope="scope">
+                    {{scope.row.article.ctime | formatTime}}
+                </template>
+            </el-table-column>
+            <el-table-column
+                    prop="utime"
+                    label="更新时间"
+                    width="200">
+                <template slot-scope="scope">
+                    {{scope.row.article.utime | formatTime}}
+                </template>
+            </el-table-column>
+            <el-table-column
+                    prop="article.userId"
+                    label="用户id"
+                    width="80">
+            </el-table-column>
+            <el-table-column
+                    prop="nickname"
+                    label="昵称"
+                    width="100">
+            </el-table-column>
+            <el-table-column
+                    prop="category.categoryId"
+                    label="分类id"
+                    width="80">
+            </el-table-column>
+            <el-table-column
+                    prop="category.categoryName"
+                    label="分类名"
+                    width="80">
+            </el-table-column>
+            <el-table-column
+                    fixed="right"
+                    label="操作"
+                    width="120">
+                <template slot-scope="scope">
+                    <a title="阅读" :href="'/#/article/' + scope.row.article.articleId ">
+                        <i class="el-icon-tickets"></i></a>
+                    <router-link title="编辑" :to="'/articleEdit/' + scope.row.article.articleId ">
+                        <i class="el-icon-edit-outline"></i></router-link>
+                    <a title="删除" href='javascript:' @click="deleteArticle(scope.row.article.articleId)"><i
+                            class="el-icon-delete"></i></a>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div class="block">
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-sizes="pageSizes"
+                    :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script th:fragment="script">
+    const article = {
+        template: "#article",
+        data() {
+            return {
+                datemin: "",
+                datemax: "",
+                userId: "",
+                title: "",
+                articlesUrl: "/api/article/list",
+                deleteUrl: "/admin/article/",
+                pageSizes: [10, 50],
+                pageSize: 10,
+                currentPage: 1,
+                total: 0,
+                articleList: []
+            }
+        },
+        methods: {
+            searchArticle() {
+                const {datemin, datemax, userId, title, pageSize, currentPage} = this;
+                console.log(datemin, datemax, userId, title, pageSize, currentPage);
+                axios.get(this.articlesUrl, {
+                    params: {
+                        datemin: datemin,
+                        datemax: datemax,
+                        userId: userId,
+                        title: title,
+                        current: currentPage,
+                        pageSize: pageSize
+                    }
+                })
+                    .then(response => {
+                            this.articleList = response.data.records;
+                            this.total = response.data.total;
+                            this.currentPage = response.data.current;
+                        }
+                    );
+            },
+            handleSizeChange(val) {
+                this.pageSize = val;
+                this.searchArticle();
+                console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                this.currentPage = val;
+                this.searchArticle();
+                console.log(`当前页: ${val}`);
+            },
+            deleteArticle(id) {
+                console.log(`删除${id}`);
+                this.$confirm('此操作将永久删除该文章, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.delete(this.deleteUrl + id)
+                        .then(res => {
+                            if (res.data.result) {
+                                this.$message({
+                                    message: '删除成功',
+                                    type: 'success'
+                                });
+                            } else {
+                                this.$message.error('删除失败');
+                            }
+                        });
+                    /*遍历到该id时，删除*/
+                    const {articleList} = this;
+                    for (const key in articleList) {
+                        if (articleList.hasOwnProperty(key) && articleList[key].article.articleId === id) {
+                            articleList.splice(key, 1);
+                        }
+                    }
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            }
+        },
+        mounted() {
+            this.searchArticle();
+        }
+    };
+
+</script>
+</body>
+
+</html>

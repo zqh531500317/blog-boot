@@ -1,0 +1,27 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<template id="pay" th:fragment="pay">
+    <div>
+        <img :src="pay_zfb" alt="zfb" width="400px">
+        <img :src="pay_wx" alt="wx" width="400px">
+    </div>
+</template>
+<script th:fragment="script">
+    const pay = {
+        template: "#pay",
+        data() {
+            return {
+                pay_zfb: "/resource/blog/img/zfb.JPG",
+                pay_wx: "/resource/blog/img/wx.JPG"
+            }
+        }
+    };
+</script>
+</body>
+
+</html>

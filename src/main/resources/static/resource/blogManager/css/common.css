@@ -1,0 +1,90 @@
+
+body {
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+    color: #4A4A4A;
+}
+
+.router-link-active {
+    text-decoration: none;
+}
+
+#app {
+    min-width: 1200px;
+    margin: 0 auto;
+    font-family: "Helvetica Neue", "PingFang SC", Arial, sans-serif;
+}
+
+/*增加下方空隙*/
+.space {
+    margin-bottom: 20px;
+}
+.red{
+    color: red;
+}
+/*背景色*/
+.back_lightblue {
+    background-color: #F5FAFE;
+}
+
+.back_black {
+    background-color: #222222;
+}
+
+/* 头部导航 */
+header {
+    z-index: 1000;
+    min-width: 1200px;
+    transition: all 0.5s ease;
+    border-top: solid 4px #3091F2;
+    background-color: #fff;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04);
+}
+
+header.header-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+header .el-menu-demo {
+    padding-left: 300px !important;
+}
+
+/* 主内容区 */
+main {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    min-height: 800px;
+    border: solid 40px #E9ECF1;
+    background-color: #FCFCFC;
+}
+
+main .main-left {
+    width: 200px;
+    float: left;
+}
+
+main .main-right {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    background-color: #fff;
+    padding: 50px 70px;
+}
+
+main .el-menu {
+    background-color: transparent !important;
+}
+.toolbar{
+    border: 1px solid #ccc;
+}
+.wangEditor {
+    border: 1px solid #ccc;
+    min-height: 600px;
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+
+<template id="register" th:fragment="register">
+    <div>
+        <el-steps :active="active" finish-status="success">
+            <el-step title="注册用户"></el-step>
+            <el-step title="验证邮箱"></el-step>
+            <el-step title="注册成功"></el-step>
+        </el-steps>
+        <div v-if="active==0">
+            <el-form :model="userForm" label-width="80px" ref="userForm" :rules="rules">
+                <el-form-item label="用户" prop="username">
+                    <el-input v-model="userForm.username"></el-input>
+                </el-form-item>
+                <el-form-item label="初始密码" prop="password">
+                    <el-input type="password" v-model="userForm.password" autocomplete="off"></el-input>
+                </el-form-item>
+                </el-form-item>
+                <el-form-item label="昵称" prop="nickname">
+                    <el-input v-model="userForm.nickname"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱" prop="email">
+                    <el-input v-model="userForm.email"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit('userForm')">立即创建</el-button>
+                    <el-button @click="resetForm('userForm')">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </div>
+        <div v-if="active==1">
+            邮箱验证码:
+            <el-input v-model="checkEmail"></el-input>
+            <el-button type="primary" @click="check">验证</el-button>
+        </div>
+        <div v-if="active==2">
+            <b class="success">已完成注册</b>
+        </div>
+    </div>
+</template>
+<script th:fragment="script">
+    const register = {
+        template: "#register",
+        data() {
+            return {
+                active: 0,
+                registUrl: "/api/user/",
+                checkEmailUrl: "/api/user/checkEmail",
+                userForm: {
+                    username: "",
+                    nickname: "",
+                    password: "",
+                    email: "",
+                },
+                checkEmail: "",
+                rules: {
+                    username: [
+                        {required: true, message: '请输入用户', trigger: 'blur'},
+                        {min: 3, message: '长度至少 3 个字符', trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                    ],
+                    email: [
+                        {required: true, message: '请输入电子邮件地址', trigger: 'blur'},
+                        {type: "email", message: '非法的电子邮件地址', trigger: 'blur'}
+                    ],
+                    nickname: [
+                        {required: true, message: '请输入昵称', trigger: 'blur'},
+                        {min: 3, message: '长度至少 3 个字符', trigger: 'blur'}
+                    ]
+                }
+            }
+        },
+        methods: {
+            next() {
+                if (this.active < 2)
+                    this.active++;
+            },
+            onSubmit(userForm) {
+                this.$refs[userForm].validate((valid) => {
+                    if (valid) {
+                        const {username, password, email, nickname} = this.userForm;
+                        console.log(username, password, email, nickname);
+                        axios.post(this.registUrl, {
+                            username: username,
+                            password: password,
+                            email: email,
+                            nickname: nickname,
+                        }).then(response => {
+                            const temp = response.data.result;
+                            if (temp === true)
+                                this.active++;
+                            else
+                                alert("提交失败");
+
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            resetForm(userForm) {
+                this.$refs[userForm].resetFields();
+            },
+            check() {
+                const {checkEmail} = this;
+                console.log(checkEmail);
+                axios.post(this.checkEmailUrl + "/" + checkEmail).then(response => {
+                    const temp = response.data;
+                    if (temp === true)
+                        this.active++;
+                    else
+                        alert("验证失败");
+                });
+            }
+        }
+    };
+</script>
+</body>
+
+</html>

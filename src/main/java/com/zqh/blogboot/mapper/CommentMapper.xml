@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqh.blogboot.mapper.CommentMapper">
+
+
+    <insert id="comment">
+        insert into comment
+            (comment_id, content, article_id, user_id, ctime, `like`)
+        values (default, #{content}, #{articleId}, #{userId}, now(), 0)
+
+    </insert>
+    <select id="commentList" resultType="com.zqh.blogboot.query.CommentResult">
+        select c.user_id    as userId,
+               u.nickname,
+               c.article_id as articleId,
+               c.`like`,
+               c.content,
+               c.comment_id as commentId,
+               c.ctime
+        from comment c
+                 left join user u
+                           on c.user_id = u.user_id
+        where c.article_id = #{articleId}
+        order by commentId
+    </select>
+
+</mapper>

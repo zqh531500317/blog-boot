@@ -1,0 +1,21 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<header class="header" th:fragment="header">
+    <el-row>
+        <el-col :span="24">
+            <el-menu default-active="main" class="el-menu-demo" mode="horizontal" :router="true">
+                <el-menu-item index="main">BlogManager v2.0</el-menu-item>
+                <el-menu-item index="2"><a href="/">博客</a></el-menu-item>
+                <el-menu-item index="3"><a href="javascript:;" @click="logout">退出登录</a></el-menu-item>
+            </el-menu>
+        </el-col>
+    </el-row>
+    <div style="position: relative;height: 60px;width: 100%;"></div>
+</header>
+</body>
+
+</html>

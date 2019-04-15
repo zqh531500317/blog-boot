@@ -1,0 +1,131 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<template id="article" th:fragment="article">
+    <div>
+        <div class=" box articleBox1">
+            <div>article:{{$route.params.id}}</div>
+            <p>
+                标题：{{article.article.title}}
+            </p>
+            <p>
+                view：{{article.article.view}}
+            </p>
+            <p>
+                like：{{article.article.like}}
+            </p>
+            <p>
+                文章分类： {{article.category.categoryName}}
+            </p>
+            <p>
+                概要：{{article.article.desc}}
+            </p>
+            <div v-html="article.article.content">
+
+            </div>
+        </div>
+        <div>
+            <el-input v-if="commentList.length>0"
+                      type="textarea"
+                      :autosize="{ minRows:3,maxRows: 10}"
+                      placeholder="评论一下吧"
+                      v-model="comment.content">
+            </el-input>
+            <el-input v-if="commentList.length==0"
+                      type="textarea"
+                      :autosize="{ minRows:3,maxRows: 10}"
+                      placeholder="还没有人评论，快点来第一个评论吧"
+                      v-model="comment.content">
+            </el-input>
+            <el-button @click="doComment">评论</el-button>
+        </div>
+        <section class="comments">
+            <h1>Comments</h1>
+            <article class="comment" v-for="(p,index)  in commentList">
+                <div class="meta">
+                    <img src="/blog/img/comment.png" class="avatar" alt="头像">
+                    <h3><a href="javascript:;" class="author">{{p.nickname}}</a></h3>
+                    <a href="javascript:;" class="date">
+                        <time>{{p.ctime | formatTime}}</time>
+                    </a>
+                </div>
+                <div class="content">
+                    {{p.content}}
+                </div>
+            </article>
+        </section>
+    </div>
+
+</template>
+<script th:fragment="script">
+    const article = {
+        template: "#article",
+        data() {
+            return {
+                id: "",
+                article: {},
+                articleUrl: "/api/article/",
+                commentUrl: "/api/comment",
+                commentListUrl: "/api/comment/",
+                comment: {
+                    content: "",
+                    articleId: ""
+                },
+                commentList: []
+            }
+        },
+        methods: {
+            fetchData() {
+                console.log('路由发送变化doing...');
+                this.id = this.$route.params.id;
+                axios.get(this.articleUrl + this.id)
+                    .then((response) => {
+                        this.article = response.data;
+                    });
+                axios.get(this.commentListUrl + this.id)
+                    .then((response) => {
+                        this.commentList = response.data;
+                    });
+            },
+            doComment() {
+                this.comment.articleId = this.$route.params.id;
+                const {content, articleId} = this.comment;
+                if(content==="") {
+                    this.$message({
+                        message: '请输入内容',
+                        type: 'warn'
+                    });
+                    return;
+                }
+
+                    console.log(content, articleId);
+                axios.post(this.commentUrl, {
+                    content: content,
+                    articleId: articleId
+                }).then(res => {
+                    if (res.data) {
+                        this.$message({
+                            message: '发表成功',
+                            type: 'success'
+                        });
+                        location.reload();
+                    }
+                })
+            }
+        },
+        created() {
+            const self = this;
+            self.fetchData();
+        },
+        watch: {
+            '$route': 'fetchData'
+        }
+    };
+</script>
+</body>
+
+</html>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqh.blogboot.mapper.ArticleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zqh.blogboot.pojo.Article">
+        <id column="article_id" property="articleId"/>
+        <result column="user_id" property="userId"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="title" property="title"/>
+        <result column="desc" property="desc"/>
+        <result column="content" property="content"/>
+        <result column="like" property="like"/>
+        <result column="view" property="view"/>
+        <result column="is_top" property="isTop"/>
+        <result column="ctime" property="ctime"/>
+        <result column="utime" property="utime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id,
+        article_id,
+        category_id,
+        title,
+        desc, content, like, view, is_top, ctime, utime
+    </sql>
+    <insert id="add">
+        insert into article (user_id,
+                             article_id,
+                             category_id,
+                             title,
+                             `desc`,
+                             content,
+                             `like`,
+                             view,
+                             is_top,
+                             ctime,
+                             utime)
+        VALUES (#{userId}, default, #{categoryId}, #{title}, #{desc}, #{content}, 0, 0, #{isTop}, now(), now());
+    </insert>
+    <update id="decArtivleNum">
+        update user
+        set article_num = article_num - 1
+        where user_id = #{userId}
+    </update>
+    <update id="updateArticle">
+        update article
+        <set>
+            <if test="categoryId!=null">
+                category_id=#{categoryId},
+            </if>
+            <if test="title!=null and title!=''">
+                title=#{title},
+            </if>
+            <if test="desc!=null and desc!=''">
+                `desc`=#{desc},
+            </if>
+            <if test="title!=null and title!=''">
+                content=#{content},
+            </if>
+            <if test="isTop!=null">
+                is_top=#{isTop},
+            </if>
+            utime=now()
+        </set>
+        where article_id=#{articleId}
+    </update>
+    <update id="incView">
+        update article
+        set view=view + 1
+        where article_id = #{id}
+    </update>
+    <resultMap id="selectList" type="com.zqh.blogboot.query.ArticleResult">
+        <result column="article_id" property="articleId"/>
+        <result column="nickname" property="nickname"/>
+        <association resultMap="BaseResultMap" property="article"/>
+        <association property="category" javaType="com.zqh.blogboot.pojo.Category">
+            <result column="category_name" property="categoryName"/>
+            <result column="category_id" property="categoryId"/>
+        </association>
+    </resultMap>
+    <select id="selectArticleList" resultMap="selectList">
+        select
+        a.user_id,a.article_id,a.category_id,a.title,a.`desc`,
+        a.`like`,a.`view`,a.is_top,a.ctime,a.utime,
+        c.category_name,u.nickname
+        from article a
+        left join user u on a.user_id = u.user_id
+        left join category c on a.category_id=c.category_id
+        <where>
+            <if test="userId!=null">
+                and a.user_id=#{userId}
+            </if>
+            <if test="title!=null and title!=''">
+                and a.title like concat('%',#{title},'%')
+            </if>
+            <if test="datemin!=null">
+                and a.utime <![CDATA[ >= ]]> #{datemin}
+            </if>
+            <if test="datemax!=null">
+                and a.utime <![CDATA[ <= ]]> #{datemax}
+            </if>
+            <if test="categoryId!=null">
+                and a.category_id=#{categoryId}
+            </if>
+        </where>
+        order by article_id desc
+        limit #{offset},#{limit}
+    </select>
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from article a
+        <where>
+            <if test="userId!=null">
+                and a.user_id=#{userId}
+            </if>
+            <if test="title!=null and title!=''">
+                and a.title like concat('%',#{title},'%')
+            </if>
+            <if test="datemin!=null">
+                and a.utime <![CDATA[ >= ]]> #{datemin}
+            </if>
+            <if test="datemax!=null">
+                and a.utime <![CDATA[ <= ]]> #{datemax}
+            </if>
+        </where>
+    </select>
+    <select id="selectArticleById" resultType="com.zqh.blogboot.pojo.Article">
+        SELECT article_id  AS articleId,
+               user_id     AS userId,
+               category_id AS categoryId,
+               title,
+               `desc`,
+               content,
+               `like`,
+               `view`,
+               is_top      AS isTop,
+               ctime,
+               utime
+        FROM article
+        WHERE article_id = #{id}
+
+    </select>
+    <select id="selectArticleResultById" resultMap="selectList">
+        select a.user_id,
+               a.article_id,
+               a.category_id,
+               a.title,
+               a.`desc`,
+               a.`like`,
+               a.`view`,
+               a.is_top,
+               a.content,
+               a.ctime,
+               a.utime,
+               c.category_name,
+               u.nickname
+        from article a
+                 left join user u on a.user_id = u.user_id
+                 left join category c on a.category_id = c.category_id
+        where a.article_id = #{id};
+    </select>
+
+</mapper>

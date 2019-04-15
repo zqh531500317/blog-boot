@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dayone个人博客管理系统</title>
+    <link href="https://cdn.bootcss.com/element-ui/2.4.11/theme-chalk/index.css" rel="stylesheet">
+    <link href="/resource/blogManager/css/common.css" rel="stylesheet"/>
+    <link rel="icon" href="/resource/blogManager/img/logo.ico" type="image/x-icon">
+</head>
+<body>
+<div id="app">
+    <div th:replace="blogManager/header :: header"></div>
+    <main>
+        <div th:replace="blogManager/left :: left"></div>
+        <div th:replace="blogManager/right :: right"></div>
+    </main>
+</div>
+</body>
+<script src="https://cdn.bootcss.com/wangEditor/10.0.13/wangEditor.min.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.5.22/vue.js"></script>
+<script src="https://cdn.bootcss.com/vue-router/3.0.2/vue-router.min.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+<script src="https://cdn.bootcss.com/element-ui/2.4.11/index.js"></script>
+<script src="https://cdn.bootcss.com/qs/6.6.0/qs.min.js"></script>
+<div th:replace="blogManager/template/main :: main"></div>
+<div th:replace="blogManager/template/user :: user"></div>
+<div th:replace="blogManager/template/userAdd :: userAdd"></div>
+<div th:replace="blogManager/template/category :: category"></div>
+<div th:replace="blogManager/template/categoryAdd :: categoryAdd"></div>
+<div th:replace="blogManager/template/categoryCombine :: categoryCombine"></div>
+<div th:replace="blogManager/template/article :: article"></div>
+<div th:replace="blogManager/template/articleAdd :: articleAdd"></div>
+<div th:replace="blogManager/template/articleEdit :: articleEdit"></div>
+<div th:replace="blogManager/template/comment :: comment"></div>
+<div th:replace="blogManager/template/log :: log"></div>
+
+<div th:replace="blogManager/template/main :: script"></div>
+<div th:replace="blogManager/template/user :: script"></div>
+<div th:replace="blogManager/template/userAdd :: script"></div>
+<div th:replace="blogManager/template/category :: script"></div>
+<div th:replace="blogManager/template/categoryAdd :: script"></div>
+<div th:replace="blogManager/template/categoryCombine :: script"></div>
+<div th:replace="blogManager/template/article :: script"></div>
+<div th:replace="blogManager/template/articleAdd :: script"></div>
+<div th:replace="blogManager/template/articleEdit :: script"></div>
+<div th:replace="blogManager/template/comment :: script"></div>
+<div th:replace="blogManager/template/log :: script"></div>
+
+<script>
+
+    const routes = [
+        {path: '/main', component: main},
+        {path: '/user', component: user},
+        {path: '/userAdd', component: userAdd},
+        {path: '/category', component: category},
+        {path: '/categoryAdd', component: categoryAdd},
+        {path: '/categoryCombine', component: categoryCombine},
+        {path: '/article', component: article},
+        {path: '/articleAdd', component: articleAdd},
+        {path: '/articleEdit/:id', component: articleEdit},
+        {path: '/comment', component: comment},
+        {path: '/system/log', component: log}];
+
+    const router = new VueRouter({
+        routes
+    });
+    //时间过滤器
+    Vue.filter('formatTime', function (value, format) {
+        return moment(value).format(format || 'YYYY-MM-DD HH:mm:ss')
+    });
+    new Vue({
+        el: '#app',
+        router: router,
+        data: {
+            logoutUrl: "/api/logout"
+        },
+        methods: {
+            logout() {
+                console.log("admin登出.............");
+                axios.post(this.logoutUrl)
+                    .then(res => {
+                    });
+                window.location.href = "/";
+            }
+        }
+    });
+
+
+</script>
+</html>

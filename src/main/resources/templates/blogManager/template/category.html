@@ -1,0 +1,67 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<template id="category" th:fragment="category">
+    <div>
+        <el-row class="space back_lightblue">
+            <el-col :span="4">
+                <el-button type="danger" class="el-icon-plus">
+                    <router-link to="categoryAdd">添加分类</router-link>
+                </el-button>
+            </el-col>
+            <el-col :span="4">
+                <el-button type="primary">
+                    <router-link to="categoryCombine">合并分类</router-link>
+                </el-button>
+            </el-col>
+        </el-row>
+        <el-table
+                ref="categoryTable"
+                :data="categoryList"
+                tooltip-effect="dark"
+                style="width: 100%"
+                class="space">
+            <el-table-column
+                    type="index"
+                    width="150">
+            </el-table-column>
+            <el-table-column
+                    label="id"
+                    width="155"
+                    prop="categoryId">
+            </el-table-column>
+            <el-table-column
+                    prop="categoryName"
+                    label="分类名"
+                    width="200">
+            </el-table-column>
+        </el-table>
+    </div>
+</template>
+
+<script th:fragment="script">
+    const category = {
+        template: "#category",
+        methods: {},
+        data() {
+            return {
+                categoryListUrl: "/api/category/list",
+                categoryList: []
+            };
+        },
+        mounted() {
+            axios.get(this.categoryListUrl)
+                .then(response => {
+                        this.categoryList = response.data;
+                    }
+                );
+        }
+    };
+
+</script>
+</body>
+
+</html>

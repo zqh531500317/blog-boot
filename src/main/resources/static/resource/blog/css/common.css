@@ -1,0 +1,91 @@
+
+body {
+    font-size: 11px;
+    font-family: 'Open Sans', sans-serif;
+    color: #4A4A4A;
+}
+
+.success {
+    color: green;
+}
+
+a {
+    text-decoration: none;
+    color: #4A4A4A;
+}
+
+.router-link-active {
+    text-decoration: none;
+}
+
+/*文章卡片*/
+.box {
+    width: 90%;
+}
+
+/*文章简介*/
+.articleBox1 {
+    width: 100%;
+    margin: 20px;
+    padding: 10px;
+    min-height: 160px;
+    position: relative;
+    display: inline-block;
+    background: -webkit-gradient(linear, 0% 20%, 0% 1000%, from(#fff), to(#fff), color-stop(.1, #f3f3f3));
+    border: 1px solid #ccc;
+    -webkit-box-shadow: 0px 3px 30px rgba(0, 0, 0, 0.1) inset;
+    -webkit-border-bottom-right-radius: 6px 50px;
+}
+
+.articleBox1:before {
+    content: '';
+    width: 50px;
+    height: 100px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    -webkit-box-shadow: 20px 20px 10px rgba(0, 0, 0, 0.1);
+    z-index: -1;
+    -webkit-transform: translate(-35px, -40px) skew(0deg, 30deg) rotate(-25deg);
+}
+
+.articleBox1:after {
+    content: '';
+    width: 100px;
+    height: 100px;
+    top: 0;
+    left: 0;
+    position: absolute;
+    display: inline-block;
+    z-index: -1;
+    -webkit-box-shadow: -10px -10px 10px rgba(0, 0, 0, 0.2);
+    -webkit-transform: rotate(2deg) translate(20px, 25px) skew(20deg);
+}
+
+/*卡片*/
+.item {
+    margin-bottom: 10px;
+}
+
+.clearfix:before,
+.clearfix:after {
+    display: table;
+    content: "";
+}
+
+.clearfix:after {
+    clear: both
+}
+
+.box-card {
+    width: 300px;
+}
+
+.toolbar {
+    border: 1px solid #ccc;
+}
+
+.wangEditor {
+    border: 1px solid #ccc;
+    min-height: 600px;
+}

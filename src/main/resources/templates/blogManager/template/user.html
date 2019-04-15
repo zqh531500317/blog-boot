@@ -1,0 +1,329 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<template id="user" th:fragment="user">
+    <div>
+        <!--搜索区域-->
+        <el-row :gutter="4" class="space">
+            <el-col :span="2">日期范围：</el-col>
+            <el-col :span="4">
+                <el-date-picker type="date" placeholder="选择日期" v-model="datemin"
+                                value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>
+            </el-col>
+            <el-col :span="1" style="text-align:center">
+                -
+            </el-col>
+            <el-col :span="4">
+                <el-date-picker type="date" placeholder="选择日期" v-model="datemax"
+                                value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>
+            </el-col>
+            <el-col :span="4">
+                <el-input v-model="username" placeholder="输入用户名称"></el-input>
+            </el-col>
+            <el-col :span="4">
+                <el-select v-model="role">
+                    <el-option key="-1" label="所有角色" value="" selected></el-option>
+                    <el-option
+                            v-for="item in roles"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-col>
+            <el-col :span="4">
+                <el-button icon="el-icon-search" circle type="primary" @click="searchUser"></el-button>
+            </el-col>
+        </el-row>
+        <!--操作区域-->
+        <el-row class="space back_lightblue">
+            <el-col :span="4">
+                <el-button type="danger" class="el-icon-delete" @click="user_deletes">批量删除</el-button>
+            </el-col>
+            <el-col :span="4">
+                <el-button type="primary" class="el-icon-plus">
+                    <router-link to="/userAdd">添加用户</router-link>
+                </el-button>
+            </el-col>
+        </el-row>
+        <el-table
+                ref="userTable"
+                :data="userList"
+                tooltip-effect="dark"
+                style="width: 100%"
+                @selection-change="handleSelectionChange"
+                class="space">
+            <el-table-column
+                    type="selection"
+                    width="55">
+            </el-table-column>
+            <el-table-column
+                    type="index"
+                    width="50">
+            </el-table-column>
+            <el-table-column
+                    label="id"
+                    width="55"
+                    prop="userId">
+            </el-table-column>
+            <el-table-column
+                    prop="username"
+                    label="账号"
+                    width="120">
+            </el-table-column>
+            <el-table-column
+                    prop="nickname"
+                    label="昵称"
+                    width="120">
+            </el-table-column>
+            <el-table-column
+                    prop="email"
+                    label="邮箱"
+                    width="200">
+            </el-table-column>
+            <el-table-column
+                    prop="locked"
+                    label="被锁定"
+                    width="120">
+                <template slot-scope="scope">
+                    <el-tag type="danger" v-if="scope.row.locked">被锁定</el-tag>
+                    <el-tag type="primary" v-if="!scope.row.locked">未锁定</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    prop="articleNum"
+                    label="文章数"
+                    width="80">
+            </el-table-column>
+            <el-table-column
+                    prop="commentNum"
+                    label="评论数"
+                    width="80">
+            </el-table-column>
+            <el-table-column
+                    prop="ctime"
+                    label="创建时间"
+                    width="200">
+                <template slot-scope="scope">
+                    {{scope.row.ctime | formatTime}}
+                </template>
+            </el-table-column>
+            <el-table-column
+                    prop="role"
+                    label="角色"
+                    width="120">
+                <template slot-scope="scope">
+                    <span v-if="scope.row.role==1">系统管理员</span>
+                    <span v-if="scope.row.role==2">普通用户</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    prop="role"
+                    label="操作"
+                    width="120">
+                <template slot-scope="scope">
+                    <a v-if="scope.row.locked" title="启用" href='javascript:' @click="user_start(scope.row.userId)"><i
+                            class="el-icon-success"></i></a>
+                    <a v-if="!scope.row.locked" title="禁用" href='javascript:' @click="user_stop(scope.row.userId)"><i
+                            class="el-icon-error"></i></a>
+                    <a title="编辑" href='javascript:' @click="user_edit(scope.row.userId)"><i
+                            class="el-icon-edit-outline"></i></a>
+                    <a title="删除" href='javascript:' @click="user_delete(scope.row.userId)"><i
+                            class="el-icon-delete"></i></a>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div class="block">
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-sizes="pageSizes"
+                    :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+
+<script th:fragment="script">
+    const user = {
+        template: "#user",
+        methods: {
+            handleSizeChange(val) {
+                this.pageSize = val;
+                this.searchUser();
+                console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                this.currentPage = val;
+                this.searchUser();
+                console.log(`当前页: ${val}`);
+            },
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            searchUser() {
+                const {datemin, datemax, username, role, pageSize, currentPage} = this;
+                console.log(datemin, datemax, username, role, pageSize, currentPage);
+                axios.get(this.usersUrl, {
+                    params: {
+                        datemin: datemin,
+                        datemax: datemax,
+                        username: username,
+                        role: role,
+                        current: currentPage,
+                        pageSize: pageSize
+                    }
+                })
+                    .then(response => {
+                            this.userList = response.data.records;
+                            this.total = response.data.total;
+                            this.currentPage = response.data.current;
+                        }
+                    );
+            },
+            user_start(id) {
+                axios.put(this.unlockUrl + '/' + id)
+                    .then(response => {
+                            /*遍历到该id时，修改它的locked值*/
+                            for (const user of this.userList) {
+                                if (user.userId === id) {
+                                    user.locked = false;
+                                    break;
+                                }
+                            }
+                            this.$message({
+                                type: 'success',
+                                message: '操作成功!'
+                            });
+                        }
+                    );
+            },
+            user_stop(id) {
+                axios.put(this.lockUrl + '/' + id)
+                    .then(response => {
+                            /*遍历到该id时，修改它的locked值*/
+                            for (const user of this.userList) {
+                                if (user.userId === id) {
+                                    user.locked = true;
+                                    break;
+                                }
+                            }
+                            this.$message({
+                                type: 'success',
+                                message: '操作成功!'
+                            });
+                        }
+                    );
+            },
+            user_edit(id) {
+                alert("编辑id=" + id);
+            },
+            user_delete(id) {
+                const {userList} = this;
+                /*确认框*/
+                this.$confirm('此操作将启用该用户, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.delete(this.deleteUrl + '/' + id)
+                        .then(response => {
+                                this.$message({
+                                    type: 'success',
+                                    message: '操作成功!'
+                                });
+                                /*遍历到该id时，删除*/
+                                for (const key in userList) {
+                                    if (userList.hasOwnProperty(key) && userList[key].userId === id) {
+                                        userList.splice(key, 1);
+                                    }
+                                }
+                            }
+                        )
+                })
+            },
+            user_deletes() {
+                const {multipleSelection, userList} = this;
+                let arr = [];
+                for (let i = 0; i < multipleSelection.length; i++) {
+                    arr[i] = multipleSelection[i].userId;
+                }
+                const params = new URLSearchParams();
+                params.append('id', JSON.stringify(arr));
+                this.$confirm('此操作将批量删除用户, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.delete(this.deletesUrl, {
+                            params: {
+                                id: arr
+                            },
+                            paramsSerializer: params => {
+                                return Qs.stringify(params, {indices: false})
+                            }
+                        }
+                    ).then(res => {
+                            this.$message({
+                                type: 'success',
+                                message: '操作成功!'
+                            });
+                            /*更新userList对象*/
+                            this.userList = userList.filter(function (v) {
+                                return multipleSelection.indexOf(v) === -1
+                            });
+                        }
+                    ).catch(error => {
+                        console.log(error);
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+
+            }
+        },
+        data() {
+            return {
+                datemin: '',
+                datemax: '',
+                username: "",
+                rolesUrl: "/admin/user/roles",
+                lockUrl: "/admin/user/lock",
+                unlockUrl: "/admin/user/unlock",
+                deleteUrl: "/admin/user",
+                deletesUrl: "/admin/user",
+                usersUrl: "/admin/user/list",
+                roles: [],
+                role: "",
+                total: 0,
+                currentPage: 1,
+                pageSizes: [10, 50],
+                pageSize: 10,
+                userList: [],
+                multipleSelection: []
+            };
+        },
+        mounted() {
+            axios.get(this.rolesUrl)
+                .then(response => {
+                        this.roles = response.data;
+                    }
+                );
+            this.searchUser();
+
+        }
+    };
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<template id="categoryCombine" th:fragment="categoryCombine">
+    <div>
+        <el-select v-model="value" placeholder="请选择" multiple>
+            <el-option
+                    v-for="item in categoryList"
+                    :key="item.categoryId"
+                    :label="item.categoryName"
+                    :value="item.categoryId">
+            </el-option>
+        </el-select>
+        <el-input placeholder="新分类" v-model="newValue"  style="width: 300px;"></el-input>
+        <el-button @click="combine">合并</el-button>
+    </div>
+</template>
+<script th:fragment="script">
+    const categoryCombine = {
+        template: "#categoryCombine",
+        data() {
+            return {
+                categoryListUrl: "/api/category/list",
+                combineUrl: "/admin/category/combine",
+                value: [],
+                newValue:"",
+                categoryList: []
+
+            }
+        },
+        methods: {
+            combine() {
+                const {value,newValue} = this;
+                console.log(value.length);
+                if (value.length !== 2) {
+                    this.$message({
+                        message: '只能2个分类进行合并',
+                        type: 'warning'
+                    });
+                    return;
+                }
+                this.$confirm('此操作将合并两个分类, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    let params = new URLSearchParams();
+                    params.append('ids', value);
+                    params.append('newValue',newValue);
+                    axios.put(this.combineUrl, params).then(response => {
+                        this.$message("合并成功");
+                        this.$router.replace("/category");
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消'
+                    });
+                });
+            }
+        },
+        mounted() {
+            axios.get(this.categoryListUrl)
+                .then(response => {
+                        this.categoryList = response.data;
+                    }
+                );
+        }
+    };
+</script>
+</body>
+
+</html>

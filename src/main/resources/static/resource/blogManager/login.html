@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link href="https://cdn.bootcss.com/element-ui/2.4.11/theme-chalk/index.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/vue/2.5.22/vue.js"></script>
+    <script src="https://cdn.bootcss.com/element-ui/2.4.11/index.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <style>
+        .el-row {
+            margin-bottom: 20px;
+        &:last-child {
+             margin-bottom: 0;
+         }
+        }
+        .login-box {
+            margin-top:20%;
+            margin-left:40%;
+        }
+    </style>
+</head>
+<body>
+<div class="login-box" id="app" >
+    <el-row>
+        <el-col :span="8">
+            <el-input id="name"  v-model="username" placeholder="请输入帐号">
+                <template slot="prepend">帐号</template>
+            </el-input>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="8">
+            <el-input id="password" v-model="password" type="password" placeholder="请输入密码">
+                <template slot="prepend">密码</template>
+            </el-input>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="8">
+            <el-button id="login" @click="check" style="width:100%" type="primary">登录</el-button>
+        </el-col>
+    </el-row>
+</div>
+
+</body>
+<script type="text/javascript">
+    new Vue({
+        el : '#app',
+        data : {
+            username : '',
+            password : ''
+        },
+        methods : {
+            check : function(event){
+                //获取值
+                const username = this.username;
+                const password = this.password;
+                if(username === '' || password === ''){
+                    this.$message({
+                        message : '账号或密码为空！',
+                        type : 'error'
+                    });
+                    return;
+                }
+                $.ajax({
+                    url : '/manage',
+                    type : 'post',
+                    data : {
+                        username : username,
+                        password : password
+                    },
+                    success : function(data) {
+                        const result = data;
+                        if(result === 'true' || result === true){
+                            window.location.href="/admin/manage";
+                        }else {
+                            alert("登录失败");
+                        }
+                    },
+                    error : function(data) {
+                        alert(data);
+                    },
+                    dataType : 'json',
+                })
+            }
+        }
+    })
+
+</script>
+
+</html>

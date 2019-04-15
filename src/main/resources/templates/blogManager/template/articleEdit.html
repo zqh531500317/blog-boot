@@ -1,0 +1,163 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+q
+<body>
+<template id="articleEdit" th:fragment="articleEdit">
+    <el-form :model="articleForm" label-width="80px" ref="articleForm" :rules="rules">
+        <el-form-item label="标题" prop="title">
+            <el-input v-model="articleForm.title"></el-input>
+        </el-form-item>
+        <el-form-item label="文章分类">
+            <el-select v-model="articleForm.categoryId">
+                <el-option v-for="(p,index) in categoryList" :key="index" :label="p.categoryName"
+                           :value="p.categoryId"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="概要" prop="desc">
+            <el-input type="textarea" :rows="3" v-model="articleForm.desc"></el-input>
+        </el-form-item>
+        <el-form-item label="是否置顶">
+            <el-radio v-model="articleForm.isTop" :label="true">否</el-radio>
+            <el-radio v-model="articleForm.isTop" :label="false">是</el-radio>
+        </el-form-item>
+        <div style="width: 50%;margin-left: auto;margin-right: auto">
+            <div id="toolbar" class="toolbar">
+
+            </div>
+            <div id="content" v-model="articleForm.content" class="wangEditor">
+                <div v-html="articleForm.content"></div>
+            </div>
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit('articleForm')">修改</el-button>
+            </el-form-item>
+        </div>
+    </el-form>
+
+
+</template>
+<script th:fragment="script">
+    const articleEdit = {
+        template: "#articleEdit",
+        data() {
+            return {
+                articleId: "",
+                categoryListUrl: "/api/category/list",
+                categoryList: [],
+                EditUrl: "/admin/article/",
+                getUrl: "/api/article/",
+                articleForm: {
+                    title: "",
+                    categoryId: "",
+                    desc: "",
+                    isTop: "",
+                    content: ""
+                },
+                rules: {
+                    title: [
+                        {required: true, message: '请输入标题', trigger: 'blur'},
+                        {min: 2, message: '长度至少 2 个字符', trigger: 'blur'}
+                    ],
+                    desc: [
+                        {required: true, message: '请输入概要', trigger: 'blur'},
+                        {min: 10, message: '长度至少 10 个字符', trigger: 'blur'}
+                    ],
+                    isTop: [
+                        {required: true, message: '请输入', trigger: 'blur'}
+                    ]
+                },
+            }
+        },
+        methods: {
+            onSubmit(articleForm) {
+                this.$refs[articleForm].validate((valid) => {
+                    if (valid) {
+                        const {title, categoryId, desc, isTop, content} = this.articleForm;
+                        axios.put(this.EditUrl + this.articleId, {
+                            title: title,
+                            categoryId: categoryId,
+                            desc: desc,
+                            isTop: isTop,
+                            content: content,
+                        }).then(response => {
+                            this.$message({
+                                message: '更新成功',
+                                type: 'success'
+                            });
+                            this.$router.replace("/article");
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            }
+        },
+        mounted() {
+            this.articleId = this.$route.params.id;
+            axios.get(this.categoryListUrl)
+                .then(response => {
+                        this.categoryList = response.data;
+                    }
+                );
+            axios.get(this.getUrl + this.articleId)
+                .then(res => {
+                    this.articleForm.title=res.data.article.title;
+                    this.articleForm.categoryId=res.data.category.categoryId;
+                    this.articleForm.desc=res.data.article.desc;
+                    this.articleForm.isTop=res.data.article.isTop;
+                    this.articleForm.content=res.data.article.content;
+                });
+            let E = window.wangEditor;
+            let editor = new E('#toolbar','#content');
+            editor.customConfig.onchange = (html) => {
+                this.articleForm.content = html
+            };
+            editor.customConfig.menus= [
+                'head',  // 标题
+                'bold',  // 粗体
+                'fontSize',  // 字号
+                'fontName',  // 字体
+                'underline',  // 下划线
+                'strikeThrough',  // 删除线
+                'foreColor',  // 文字颜色
+                'backColor',  // 背景颜色
+                'link',  // 插入链接
+                'list',  // 列表
+                'justify',  // 对齐方式
+                'quote',  // 引用
+                'image',  // 插入图片
+                'table',  // 表格
+                'code',  // 插入代码
+                'undo',  // 撤销
+                'redo'  // 重复
+            ];
+            editor.customConfig.uploadImgServer = '/api/upload';  // 上传图片到服务器
+            editor.customConfig.uploadFileName = 'file';//文件名
+            editor.customConfig.uploadImgMaxSize = 10 * 1024 * 1024;
+            editor.customConfig.uploadImgHooks = {
+                before: function (xhr, editor, files) {
+                },
+                success: function (xhr, editor, result) {
+                    console.log("上传成功");
+                },
+                fail: function (xhr, editor, result) {
+                    console.log("上传失败,原因是" + result);
+                },
+                error: function (xhr, editor) {
+                    console.log("上传出错");
+                },
+                timeout: function (xhr, editor) {
+                    console.log("上传超时");
+                },
+                customInsert: function (insertImg, result, editor) {
+                    insertImg(result.url)
+                }
+            };
+            editor.create();
+        }
+    };
+</script>
+</body>
+
+</html>

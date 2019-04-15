@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dayone个人博客</title>
+    <link href="https://cdn.bootcss.com/element-ui/2.4.11/theme-chalk/index.css" rel="stylesheet">
+    <link href="/resource/blog/css/comment.css" rel="stylesheet">
+    <link href="/resource/blog/css/common.css" rel="stylesheet">
+    <link rel="icon" href="/resource/blog/img/logo.ico" type="image/x-icon">
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <div th:replace="blog/header :: header"></div>
+        <div th:replace="blog/content :: content"></div>
+        <div th:replace="blog/footer :: footer"></div>
+    </el-container>
+</div>
+</body>
+<script src="https://cdn.bootcss.com/vue/2.5.22/vue.js"></script>
+<script src="https://cdn.bootcss.com/vue-router/3.0.2/vue-router.min.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdn.bootcss.com/element-ui/2.4.11/index.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+<!--template-->
+<div th:replace="blog/template/main :: main"></div>
+<div th:replace="blog/template/category :: category"></div>
+<div th:replace="blog/template/pay :: pay"></div>
+<div th:replace="blog/template/register :: register"></div>
+<div th:replace="blog/template/forget :: forget"></div>
+<div th:replace="blog/template/article :: article"></div>
+<!--script-->
+<div th:replace="blog/template/main :: script"></div>
+<div th:replace="blog/template/category :: script"></div>
+<div th:replace="blog/template/pay :: script"></div>
+<div th:replace="blog/template/register :: script"></div>
+<div th:replace="blog/template/forget :: script"></div>
+<div th:replace="blog/template/article :: script"></div>
+<script>
+
+    const routes = [
+        {path: '/main', component: main},
+        {path: '/category/:id', component: category},
+        {path: '/pay', component: pay},
+        {path: '/register', component: register},
+        {path: '/forget', component: forget},
+        {path: '/article/:id', component: article},
+        {path: '', component: main}
+    ];
+
+    const router = new VueRouter({
+        routes
+    });
+    Vue.filter('categoryFormat', function (url) {
+        return "/category/" + url
+    });
+    Vue.filter('articleFormat', function (url) {
+        return "/article/" + url
+    });
+    //时间过滤器
+    Vue.filter('formatTime', function (value, format) {
+        return moment(value).format(format || 'YYYY-MM-DD HH:mm')
+    });
+    new Vue({
+        el: '#app',
+        router: router,
+        data: {
+            author: "Dayone",
+            logo: "/resource/blog/img/logo.jpg",
+            backgroundImg: "/resource/blog/img/bigShow.jpg",
+            activeIndex: '/main',
+            searchText: "",
+            categoryUrl: "/api/category/listWithCount",
+            articleTopUrl: "/api/article/top",
+            recommendUrl: "/api/article/recommend",
+            category: [],
+            topList: [],
+            recommendList: [],
+            isLogin: false,
+            username: "",
+            password: "",
+            loginUrl: "/api/login",
+            logoutUrl: "/api/logout"
+        },
+        methods: {
+            handleSelect(key, keyPath) {
+                console.log(key, keyPath);
+            },
+            login() {
+                const {username, password, loginUrl} = this;
+                let param = new URLSearchParams();
+                param.append('username', username);
+                param.append('password', password);
+                axios({
+                    method: 'post',
+                    url: loginUrl,
+                    data: param
+                }).then(res => {
+                    if (res.data) {
+                        this.isLogin = true;
+                        this.password="";
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '登录失败'
+                        });
+                    }
+                })
+            },
+            logout() {
+                axios.post(this.logoutUrl)
+                    .then(res => {
+                        this.isLogin = false
+                    })
+            }
+        },
+        mounted() {
+            axios.get(this.categoryUrl)
+                .then((response) => {
+                    this.category = response.data;
+                });
+            axios.get(this.articleTopUrl)
+                .then((response) => {
+                    this.topList = response.data;
+                });
+            axios.get(this.recommendUrl)
+                .then((response) => {
+                    this.recommendList = response.data;
+                });
+        }
+    });
+
+</script>
+</html>

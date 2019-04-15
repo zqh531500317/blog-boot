@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqh.blogboot.mapper.CategoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zqh.blogboot.pojo.Category">
+        <id column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="ctime" property="ctime"/>
+        <result column="sort" property="sort"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        category_id,
+        category_name,
+        ctime,
+        sort
+    </sql>
+    <update id="updateArticle">
+        update article
+        set category_id=#{newValue}
+        where category_id=#{oldValue1} or category_id=#{oldValue2}
+    </update>
+    <select id="selectAllAndArticleNum" resultType="com.zqh.blogboot.pojo.Category">
+        select c.category_id, c.category_name, count(1) articleNum
+        from category c
+                 join article a on c.category_id = a.category_id
+        GROUP BY c.category_id
+        ORDER BY c.sort desc
+    </select>
+</mapper>

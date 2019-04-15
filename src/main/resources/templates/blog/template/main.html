@@ -1,0 +1,62 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<template id="main" th:fragment="main">
+    <div>
+        <div class="box">
+            <div v-for="(p,index) in article" :key="index" class="articleBox1">
+                <el-tag>
+                    <router-link :to="p.articleId | articleFormat">{{p.article.title}}</router-link>
+                </el-tag>
+                <b>
+                    <router-link :to="p.category.categoryId | categoryFormat">分类：{{p.category.categoryName}}
+                    </router-link>
+                </b>
+                <p>{{p.article.desc}}</p>
+            </div>
+        </div>
+        <div class="block">
+            <el-pagination
+                    layout="prev, pager, next"
+                    :total="total"
+                    :page-size="pageSize">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+
+<script th:fragment="script">
+    const main = {
+        template: "#main",
+        data() {
+            return {
+                article: [],
+                current: "",
+                total: 0,
+                pageSize: 10,
+                articleUrl: '/api/article/list',
+            }
+        },
+        mounted() {
+            const {current, pageSize} = this;
+            axios.get(this.articleUrl, {
+                params: {
+                    current: current,
+                    pageSize: pageSize
+                }
+            })
+                .then((response) => {
+                    this.article = response.data.records;
+                    this.current = response.data.current;
+                    this.total = response.data.total
+                });
+        }
+    };
+</script>
+</body>
+
+</html>
