@@ -1,5 +1,5 @@
 # blog-boot
-基于springboot+mybatisplus+vue+element-ui
+基于springboot+mybatisplus+vue+element-ui的博客和博客管理系统
 
 1、创建数据库blog
 
