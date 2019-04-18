@@ -23,7 +23,7 @@ public class Login implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
-        logger.info("尝试拦截" + httpServletRequest.getRequestURI());
+        //logger.info("尝试拦截" + httpServletRequest.getRequestURI());
         if (httpServletRequest.getRequestURI().equals(homePath) ||
                 httpServletRequest.getRequestURI().contains(loginPath) ||
                 httpServletRequest.getRequestURI().contains(resource) ||
@@ -31,19 +31,19 @@ public class Login implements HandlerInterceptor {
                 httpServletRequest.getRequestURI().contains(apiPath)) {
             return true;
         }
-        logger.info("拦截特殊资源");
+       // logger.info("拦截特殊资源");
         if (httpServletRequest.getRequestURI().contains(adminPath)) {
             User user = (User) httpServletRequest.getSession().getAttribute("user");
             if (user == null || user.getRole() != 1) {
-                logger.info("拦截到admin");
+                //logger.info("拦截到admin");
                 httpServletResponse.sendRedirect(loginPath);
                 return false;
             } else {
-                logger.info("通过admin拦截");
+               // logger.info("通过admin拦截");
                 return true;
             }
         }
-        logger.info("拦截其他情况");
+        //logger.info("拦截其他情况");
 
         //其他情况
         User user = (User) httpServletRequest.getSession().getAttribute("user");

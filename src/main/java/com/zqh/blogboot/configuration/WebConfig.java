@@ -9,7 +9,6 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@PropertySource("classpath:config/file.properties")
 public class WebConfig implements WebMvcConfigurer {
     @Value("${upload.path}")
     private String filepath;

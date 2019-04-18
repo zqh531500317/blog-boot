@@ -10,8 +10,8 @@
     </parent>
     <groupId>com.zqh</groupId>
     <artifactId>blog-boot</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>blog-boot</name>
+    <version>1</version>
+    <name>blog</name>
     <description>zqh的个人博客</description>
 
     <properties>

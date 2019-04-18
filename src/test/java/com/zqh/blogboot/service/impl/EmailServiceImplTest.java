@@ -1,3 +1,4 @@
+/*
 package com.zqh.blogboot.service.impl;
 
 import com.zqh.blogboot.service.EmailService;
@@ -44,4 +45,4 @@ public class EmailServiceImplTest {
 
         emailService.sendInlineResourceEmail("531500317@qq.com", "主题：这是有图片的邮件", content, imgPath, rscId);
     }
-}
+}*/

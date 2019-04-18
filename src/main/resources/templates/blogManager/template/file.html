@@ -1,0 +1,98 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<template id="file" th:fragment="file">
+    <div>
+        <span>保存时间</span>
+        <el-radio-group v-model="content.liveTime">
+            <el-radio :label="7">7天</el-radio>
+            <el-radio :label="15">15天</el-radio>
+            <el-radio :label="10000">永久</el-radio>
+        </el-radio-group>
+        <el-upload
+                class="upload-file"
+                drag
+                :data="content"
+                :action="uploadUrl">
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        </el-upload>
+        <el-table
+                :data="fileList"
+                tooltip-effect="dark"
+                style="width: 100%"
+                class="space">
+            <el-table-column
+                    label="id"
+                    width="70"
+                    prop="id">
+            </el-table-column>
+            <el-table-column
+                    prop="name"
+                    label="文件名"
+                    width="300">
+            </el-table-column>
+            <el-table-column
+                    prop="date"
+                    label="创建时间"
+                    width="200">
+                <template slot-scope="scope">
+                    {{scope.row.date | formatTime}}
+                </template>
+            </el-table-column>
+            <el-table-column
+                    label="操作"
+                    width="120">
+                <template slot-scope="scope">
+                    <a title="删除" href='javascript:' @click="deleteFile(scope.row.id)"><i
+                            class="el-icon-delete"></i></a>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+</template>
+<script th:fragment="script">
+    const file = {
+        template: "#file",
+        data() {
+            return {
+                uploadUrl: "/admin/upload",
+                listUrl: "/admin/upload/list",
+                fileList: [],
+                deleteUrl: "/admin/upload/",
+                content: {liveTime: "15"}
+            }
+        },
+        methods: {
+            getList() {
+                axios.get(this.listUrl)
+                    .then(res => {
+                        this.fileList = res.data;
+                    })
+            },
+            deleteFile(id) {
+                //编写删除代码
+                axios.delete(this.deleteUrl + id)
+                    .then(res => {
+                        if (res.data) {
+                            window.location.reload();
+                        } else {
+                            this.$message({
+                                message: '删除失败'
+                            });
+                        }
+                    })
+            }
+        },
+        mounted() {
+            this.getList();
+        }
+    };
+</script>
+</body>
+
+</html>

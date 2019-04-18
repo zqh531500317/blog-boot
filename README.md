@@ -29,9 +29,7 @@ ui框架：element-ui
 
 2、执行doc/blog.sql
 
-3、修改config/application.properties下的数据库和邮件配置信息
-
-4、修改config/file.properties下的upload.path（图片上传存储目录）
+3、修改config/application.properties下的数据库和邮件配置信息和upload.path（图片上传存储目录）
 
 # 运行截图
 ![image](https://github.com/zqh531500317/blog-boot/blob/master/doc/screenshots/%E9%A6%96%E9%A1%B5.PNG)

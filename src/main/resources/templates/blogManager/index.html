@@ -34,6 +34,7 @@
 <div th:replace="blogManager/template/articleEdit :: articleEdit"></div>
 <div th:replace="blogManager/template/comment :: comment"></div>
 <div th:replace="blogManager/template/log :: log"></div>
+<div th:replace="blogManager/template/file :: file"></div>
 
 <div th:replace="blogManager/template/main :: script"></div>
 <div th:replace="blogManager/template/user :: script"></div>
@@ -46,6 +47,7 @@
 <div th:replace="blogManager/template/articleEdit :: script"></div>
 <div th:replace="blogManager/template/comment :: script"></div>
 <div th:replace="blogManager/template/log :: script"></div>
+<div th:replace="blogManager/template/file :: script"></div>
 
 <script>
 
@@ -60,6 +62,7 @@
         {path: '/articleAdd', component: articleAdd},
         {path: '/articleEdit/:id', component: articleEdit},
         {path: '/comment', component: comment},
+        {path: '/file', component: file},
         {path: '/system/log', component: log}];
 
     const router = new VueRouter({
