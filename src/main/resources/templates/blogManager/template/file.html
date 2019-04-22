@@ -50,6 +50,8 @@
                 <template slot-scope="scope">
                     <a title="删除" href='javascript:' @click="deleteFile(scope.row.id)"><i
                             class="el-icon-delete"></i></a>
+                    <a title="下载" href='javascript:' @click="download(scope.row.id)"><i
+                            class="el-icon-download"></i></a>
                 </template>
             </el-table-column>
         </el-table>
@@ -64,6 +66,7 @@
                 listUrl: "/admin/upload/list",
                 fileList: [],
                 deleteUrl: "/admin/upload/",
+                downloadUrl:"/admin/download/",
                 content: {liveTime: "15"}
             }
         },
@@ -75,7 +78,6 @@
                     })
             },
             deleteFile(id) {
-                //编写删除代码
                 axios.delete(this.deleteUrl + id)
                     .then(res => {
                         if (res.data) {
@@ -86,6 +88,19 @@
                             });
                         }
                     })
+            },
+            download(id){
+                window.location.href=this.downloadUrl + id;
+                /*axios.get(this.downloadUrl + id)
+                    .then(res => {
+                        if (res.data) {
+                            //window.location.reload();
+                        } else {
+                            this.$message({
+                                message: '删除失败'
+                            });
+                        }
+                    })*/
             }
         },
         mounted() {

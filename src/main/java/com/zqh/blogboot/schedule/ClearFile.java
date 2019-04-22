@@ -41,8 +41,6 @@ public class ClearFile {
         return list.stream().filter((e) -> {
             Calendar now = Calendar.getInstance();
             now.set(Calendar.DATE, now.get(Calendar.DATE) - e.getLiveTime());
-            System.out.println(now.getTime().getTime());
-            System.out.println(e.getDate().getTime());
             return now.getTime().getTime() > e.getDate().getTime();
         }).collect(Collectors.toList());
     }
