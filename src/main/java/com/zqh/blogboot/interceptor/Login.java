@@ -19,6 +19,7 @@ public class Login implements HandlerInterceptor {
     private static final String loginPath = "/manage";
     private static final String resource = "/resource";
     private static final String error = "/error";
+    private static final String img = "/img";
     private Logger logger = LoggerFactory.getLogger(Login.class);
 
     @Override
@@ -28,10 +29,11 @@ public class Login implements HandlerInterceptor {
                 httpServletRequest.getRequestURI().contains(loginPath) ||
                 httpServletRequest.getRequestURI().contains(resource) ||
                 httpServletRequest.getRequestURI().contains(error) ||
-                httpServletRequest.getRequestURI().contains(apiPath)) {
+                httpServletRequest.getRequestURI().contains(apiPath) ||
+                httpServletRequest.getRequestURI().contains(img)) {
             return true;
         }
-       // logger.info("拦截特殊资源");
+        // logger.info("拦截特殊资源");
         if (httpServletRequest.getRequestURI().contains(adminPath)) {
             User user = (User) httpServletRequest.getSession().getAttribute("user");
             if (user == null || user.getRole() != 1) {
@@ -39,11 +41,11 @@ public class Login implements HandlerInterceptor {
                 httpServletResponse.sendRedirect(loginPath);
                 return false;
             } else {
-               // logger.info("通过admin拦截");
+                // logger.info("通过admin拦截");
                 return true;
             }
         }
-        //logger.info("拦截其他情况");
+        logger.info("拦截其他情况");
 
         //其他情况
         User user = (User) httpServletRequest.getSession().getAttribute("user");
