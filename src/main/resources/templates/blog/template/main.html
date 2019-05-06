@@ -19,43 +19,69 @@
                 <p>{{p.article.desc}}</p>
             </div>
         </div>
-        <div class="block">
-            <el-pagination
-                    layout="prev, pager, next"
-                    :total="total"
-                    :page-size="pageSize">
-            </el-pagination>
-        </div>
     </div>
 </template>
 
 <script th:fragment="script">
     const main = {
-        template: "#main",
-        data() {
-            return {
-                article: [],
-                current: "",
-                total: 0,
-                pageSize: 10,
-                articleUrl: '/api/article/list',
-            }
-        },
-        mounted() {
-            const {current, pageSize} = this;
-            axios.get(this.articleUrl, {
-                params: {
-                    current: current,
-                    pageSize: pageSize
+            template: "#main",
+            data() {
+                return {
+                    article: [],
+                    current: "",
+                    total: 0,
+                    pageSize: 10,
+                    articleUrl: '/api/article/list',
+                    isFinish: false
                 }
-            })
-                .then((response) => {
-                    this.article = response.data.records;
-                    this.current = response.data.current;
-                    this.total = response.data.total
-                });
+            },
+            methods: {
+                getArticles(current, pageSize) {
+                    axios.get(this.articleUrl, {
+                        params: {
+                            current: current,
+                            pageSize: pageSize
+                        }
+                    })
+                        .then((response) => {
+                            this.article = this.article.concat(response.data.records);
+                            this.current = response.data.current;
+                            this.total = response.data.total;
+                            if (response.data.records.length == 0)
+                                this.isFinish = true;
+                        });
+                },
+                scroll() {
+                    window.onscroll = () => {
+                        //如果数据没有加载完
+                        if (!this.isFinish) {
+                            //变量scrollTop是滚动条滚动时，距离顶部的距离
+                            var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+                            //变量windowHeight是可视区的高度
+                            var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+                            //变量scrollHeight是滚动条的总高度
+                            var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+                            console.log(scrollTop);
+                            console.log(windowHeight);
+                            console.log(scrollHeight);
+                            //滚动条到底部的条件
+                            if (scrollTop + windowHeight >= scrollHeight - 100) {
+                                this.current++;
+                                this.getArticles(this.current, this.pageSize);
+                            }
+                        }
+                    };
+
+                }
+            },
+            mounted() {
+                const {current, pageSize} = this;
+                this.getArticles(current, pageSize);
+                //滚动刷新
+                this.scroll();
+            }
         }
-    };
+    ;
 </script>
 </body>
 

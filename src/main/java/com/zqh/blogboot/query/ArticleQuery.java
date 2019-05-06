@@ -32,7 +32,7 @@ public class ArticleQuery {
     }
 
     public Integer getPageSize() {
-        if (pageSize == null || (pageSize != 10 && pageSize != 50))
+        if (pageSize == null || (pageSize != 5 && pageSize != 10 && pageSize != 50))
             pageSize = 10;
         return pageSize;
     }

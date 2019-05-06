@@ -39,12 +39,11 @@
                 total: 0,
                 pageSize: 10,
                 articleUrl: '/api/article/list',
+                isFinish: false
             }
         },
         methods: {
-            fetchData() {
-                console.log('路由发送变化doing...');
-                const {current, pageSize} = this;
+            getArticles(current, pageSize) {
                 axios.get(this.articleUrl, {
                     params: {
                         current: current,
@@ -53,18 +52,45 @@
                     }
                 })
                     .then((response) => {
-                        this.article = response.data.records;
+                        this.article = this.article.concat(response.data.records);
                         this.current = response.data.current;
-                        this.total = response.data.total
+                        this.total = response.data.total;
+                        if (response.data.records.length == 0)
+                            this.isFinish = true;
                     });
+            },
+            scroll() {
+                window.onscroll = () => {
+                    //如果数据没有加载完
+                    if (!this.isFinish) {
+                        //变量scrollTop是滚动条滚动时，距离顶部的距离
+                        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+                        //变量windowHeight是可视区的高度
+                        const windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+                        //变量scrollHeight是滚动条的总高度
+                        const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+                        console.log(scrollTop);
+                        console.log(windowHeight);
+                        console.log(scrollHeight);
+                        //滚动条到底部的条件
+                        if (scrollTop + windowHeight >= scrollHeight - 100) {
+                            this.current++;
+                            this.getArticles(this.current, this.pageSize);
+                        }
+                    }
+                };
             }
         },
         created() {
-            const self = this;
-            self.fetchData();
+            const {current, pageSize} = this;
+            this.getArticles(current, pageSize);
         },
         watch: {
             '$route': 'fetchData'
+        },
+        mounted() {
+            //滚动刷新
+            this.scroll();
         }
     };
 </script>
